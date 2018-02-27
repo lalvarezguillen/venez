@@ -112,16 +112,25 @@ async function getCneUser(ci, nat){
     }
 }
 
-function crawlCne(){
+function queueCneRequests(){
+    const queue = kue.createQueue();
     const nat = 'V';
     const cis = range.range(19500001, 19500100);
     for (let ci of cis) {
         console.log(ci, nat);
-        getCneUser(ci, nat);
-        delay(500);
+        let job = queue.create(
+            'cneRequest',
+            {
+                'ci': ci,
+                'nat': nat
+            }
+        ).attempts(5)
+         .backoff({type:'exponential'})
+         .removeOnComplete(true)
+         .save()
     }
 }
 // getSaimeData(3000000, 'V')
 // getCneData(3000000, 'V')
 // storeData(9000, {data:'some data'})
-crawlCne()
+queueCneRequests()
