@@ -1,15 +1,9 @@
 const MongoClient = require('mongodb').MongoClient;
+const kue = require('kue');
+const config = require('./config')
 
-const config = {
-    saimeUrl: 'https://tramites.saime.gob.ve/index.php?r=usuario/usuario/BuscarSaimeContacto',
-    cneUrlBase: 'http://www.cne.gov.ve/web/registro_electoral/ce.php',
-    mongoUrl: 'mongodb://localhost:27017',
-    saimeCollection: 'saime',
-    cneCollection: 'cne',
-    mongoDB: 'venez',
-}
 
-async function storeData(data) {
+async function storeData(data, done) {
     let client, db, coll;
     try {
         client = await MongoClient.connect(config.mongoUrl);

@@ -2,15 +2,8 @@ const kue = require('kue');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const MongoClient = require('mongodb').MongoClient;
+const config = require('./config')
 
-const config = {
-    saimeUrl: 'https://tramites.saime.gob.ve/index.php?r=usuario/usuario/BuscarSaimeContacto',
-    cneUrlBase: 'http://www.cne.gov.ve/web/registro_electoral/ce.php',
-    mongoUrl: 'mongodb://localhost:27017',
-    saimeCollection: 'saime',
-    cneCollection: 'cne',
-    mongoDB: 'venez',
-}
 
 async function getCneData(ci, nat, done) {
     const url = `${config.cneUrlBase}?nacionalidad=${nat}&cedula=${ci}`;
@@ -18,14 +11,18 @@ async function getCneData(ci, nat, done) {
     try {
         const resp = await axios.get(url);
         if (resp.status != 200) {
+            console.log(resp.status)
             done(new Error(resp.status))
         }
         const dom = cheerio.load(resp.data);
         if (isRegisteredInCne(dom)) {
             const parsedData =  parseCneData(dom);
             parsedData['_id'] = key;
-            console.log(parsedData);
+            // console.log(parsedData);
             queueCneStore(parsedData);
+        }
+        else {
+            console.log(`unregistered: ${ci}`)
         }
         done()
     }
@@ -62,7 +59,7 @@ function parseCneData(dom) {
         centro: dom('td').eq(21).text(),
         direccion: dom('td').eq(23).text()
     }
-    console.log(data);
+    // console.log(data);
     return data;
 }
 
