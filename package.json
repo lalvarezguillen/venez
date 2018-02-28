@@ -1,0 +1,22 @@
+{
+  "name": "async_await_tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "config.js",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.2",
+    "commander": "^2.14.1",
+    "delay": "^2.0.0",
+    "jsdom": "^11.6.2",
+    "kue": "^0.11.6",
+    "mongodb": "^3.0.3",
+    "range": "^0.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

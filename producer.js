@@ -4,6 +4,8 @@ const cheerio = require('cheerio');
 const delay = require('delay');
 const range = require('range');
 const kue = require('kue');
+const commander = require('commander');
+const config = require('./config');
 
 function createCIGen(initial, nat) {
     if (nat.toUpperCase() != 'V' && nat.toUpperCase() != 'E') {
@@ -94,15 +96,6 @@ async function storeData(data) {
     console.log('listo el pollo')
 }
 
-const config = {
-    saimeUrl: 'https://tramites.saime.gob.ve/index.php?r=usuario/usuario/BuscarSaimeContacto',
-    cneUrlBase: 'http://www.cne.gov.ve/web/registro_electoral/ce.php',
-    mongoUrl: 'mongodb://localhost:27017',
-    saimeCollection: 'saime',
-    cneCollection: 'cne',
-    mongoDB: 'venez',
-}
-
 async function getCneUser(ci, nat){
     const data = await getCneData(ci, nat);
     if (data) {
@@ -112,16 +105,33 @@ async function getCneUser(ci, nat){
     }
 }
 
-function crawlCne(){
+async function queueCneRequests(start, end){
+    const queue = kue.createQueue();
     const nat = 'V';
-    const cis = range.range(19500001, 19500100);
+    const cis = range.range(start, end);
     for (let ci of cis) {
         console.log(ci, nat);
-        getCneUser(ci, nat);
-        delay(500);
+        let job = await queue.create(
+            'cneRequest',
+            {
+                'ci': ci,
+                'nat': nat
+            }
+        ).attempts(5)
+         .backoff({type:'exponential'})
+         .removeOnComplete(true)
+         .save()
     }
 }
-// getSaimeData(3000000, 'V')
-// getCneData(3000000, 'V')
-// storeData(9000, {data:'some data'})
-crawlCne()
+
+function getCiBoundaries() {
+    commander.option('-s, --start [first_ci]', 'The first CI of the range')
+             .option('-e, --end [last_ci]', 'The last CI of the range')
+             .parse(process.argv)
+    return {
+        start: commander.start,
+        end: commander.end
+    }
+}
+const {start, end} = getCiBoundaries();
+queueCneRequests(parseInt(start), parseInt(end))
