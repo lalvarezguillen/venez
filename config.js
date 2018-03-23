@@ -7,7 +7,7 @@ const config = {
     mongoDB: 'venez',
     redisUrl: `redis://${process.env.REDIS_HOST}`,
     apiHost: '0.0.0.0',
-    apiPort: 3333,
+    apiPort: parseInt(process.env.API_PORT),
 }
 
 module.exports = config;

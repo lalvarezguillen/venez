@@ -11,28 +11,18 @@ services:
     build: 
       context: .
       dockerfile: monitoring.Dockerfile
-  request_consumer:
+  consumer:
     environment:
       - REDIS_HOST=redis:6379
       - MONGO_HOST=mongo:27017
     build:
       context: .
-      dockerfile: request_consumer.Dockerfile
-  store_consumer:
-    environment:
-      - REDIS_HOST=redis:6379
-      - MONGO_HOST=mongo:27017
-    build:
-      context: .
-      dockerfile: store_consumer.Dockerfile
-  producer:
+      dockerfile: consumer.Dockerfile
+  api:
     environment:
       - MONGO_HOST=mongo:27017
       - REDIS_HOST=redis:6379
-      - FIRST_CI=20000000
-      - LAST_CI=20000500
-      - CI_BATCH=500
-      - BATCH_TIMEOUT=1000
+      - API_PORT=80
     build:
       context: .
-      dockerfile: producer.Dockerfile
+      dockerfile: api.Dockerfile
