@@ -8,12 +8,16 @@
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.14.1",
     "delay": "^2.0.0",
+    "hapi": "^17.2.3",
     "jsdom": "^11.6.2",
     "kue": "^0.11.6",
     "mongodb": "^3.0.3",
     "range": "^0.0.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-google": "^0.9.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
