@@ -27,7 +27,9 @@ async function storeData(data, done) {
 }
 
 function runTasks(){
-    const queue = kue.createQueue();
+    const queue = kue.createQueue({
+        redis: config.redisUrl,
+    });
     queue.process('cneStore', 5, async function(job, done){
         try {
             await storeData(job.data, done);
