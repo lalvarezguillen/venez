@@ -30,7 +30,7 @@ async function queueCneRequests(start, end, done){
             }
         ).attempts(5)
          .backoff({type:'exponential'})
-        //  .removeOnComplete(true)
+         .removeOnComplete(true)
          .save()
     }
     done()
@@ -87,6 +87,7 @@ function queueCneStore(data){
     const job = queue.create('cneStore', data)
                      .attempts(5)
                      .backoff({type:'exponential'})
+                     .removeOnComplete( true )
                      .save()
 }
 
