@@ -11,6 +11,9 @@ services:
     build: 
       context: .
       dockerfile: monitoring.Dockerfile
+    depends_on:
+      - redis
+      - mongo
   consumer:
     environment:
       - REDIS_HOST=redis:6379
@@ -18,6 +21,9 @@ services:
     build:
       context: .
       dockerfile: consumer.Dockerfile
+    depends_on:
+      - redis
+      - mongo
   api:
     environment:
       - MONGO_HOST=mongo:27017
@@ -26,3 +32,6 @@ services:
     build:
       context: .
       dockerfile: api.Dockerfile
+    depends_on:
+      - redis
+      - mongo

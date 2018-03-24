@@ -46,8 +46,15 @@ async function queueCneRequests(start, end, done){
 async function getCneData(ci, nat, done) {
     const url = `${config.cneUrlBase}?nacionalidad=${nat}&cedula=${ci}`;
     const key = `${nat}${ci}`;
+    const chromeAgent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 \
+                        (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'
+    const requestConfig = {
+        'headers': {
+            'User-Agent': chromeAgent,
+        }
+    }
     try {
-        const resp = await axios.get(url);
+        const resp = await axios.get(url, requestConfig);
         if (resp.status != 200) {
             console.log(resp.status)
             done(new Error(resp.status))
@@ -124,15 +131,8 @@ function parseCneData(dom) {
  * @param {*} done 
  */
 async function storeData(data, done) {
-    let client, db, coll;
-    try {
-        client = await MongoClient.connect(config.mongoUrl);
-    }
-    catch (error) {
-        console.log(error)
-        done(error)
-    }
-    db = client.db(config.mongoDB);
+    let db, coll;
+    db = mongoClient.db(config.mongoDB);
     coll = db.collection(config.cneCollection);
 
     try {
@@ -146,10 +146,19 @@ async function storeData(data, done) {
 }
 
 
+var mongoClient;
 /**
  * Starts consuming the tasks in the queue.
  */
 async function runTasks(){
+    try {
+        mongoClient = await MongoClient.connect(config.mongoUrl);
+    }
+    catch (error) {
+        console.log(error);
+        process.exit(1);
+    }
+    console.log('connected to Mongo. Starting to consume tasks...');
     queue.process('cneRequest', 5, async function(job, done){
         try {
             await getCneData(job.data.ci, job.data.nat, done);
@@ -159,7 +168,7 @@ async function runTasks(){
         }
     });
 
-    queue.process('cneStore', 4, async function(job, done){
+    queue.process('cneStore', 3, async function(job, done){
         try {
             await storeData(job.data, done);
         }
