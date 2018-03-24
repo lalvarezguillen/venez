@@ -74,7 +74,7 @@ async function getCneData(ci, nat, done) {
         done()
     }
     catch (error){
-        console.log(error);
+        console.log(error.response.status, error.response.statusText);
         done(error)
     }
 }
