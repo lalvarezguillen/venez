@@ -8,6 +8,8 @@ const config = {
     redisUrl: `redis://${process.env.REDIS_HOST}`,
     apiHost: '0.0.0.0',
     apiPort: parseInt(process.env.API_PORT),
+    proxyHost: process.env.PROXY_HOST,
+    proxyPort: process.env.PROXY_PORT,
 }
 
 module.exports = config;

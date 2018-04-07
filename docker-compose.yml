@@ -4,6 +4,10 @@ services:
     image: "redis:alpine"
   mongo:
     image: "mongo"
+  proxy:
+    environment:
+      - tors=25
+    image: "mattes/rotating-proxy"
   monitoring:
     environment:
       - REDIS_HOST=redis:6379
@@ -16,6 +20,8 @@ services:
       - mongo
   consumer:
     environment:
+      - PROXY_HOST=proxy
+      - PROXY_PORT=5566
       - REDIS_HOST=redis:6379
       - MONGO_HOST=mongo:27017
     build:
@@ -24,6 +30,7 @@ services:
     depends_on:
       - redis
       - mongo
+      - proxy
   api:
     environment:
       - MONGO_HOST=mongo:27017
